@@ -1,25 +1,26 @@
 const Tour = require('./../models/tourModel');
+const APIFeatures = require('./../utils/apiFeatures');
+
+exports.aliasController = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingsAverage,price';
+  req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next();
+};
 
 exports.getAllTours = async (req, res) => {
   console.log('hi');
   try {
-    // BUILD QUERY
-    // 1)Filtering
-    const queryObj = { ...req.query };
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
-    excludedFields.forEach(el => delete queryObj[el]);
-    
-
-    // 2)Advanced Filtering
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-
-    const query = Tour.find(JSON.parse(queryStr));
-
     // EXECUTE QUERY
-    const tourData = await query;
+    const features = new APIFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const tourData = await features.query;
     res.status(200).json({
       status: 'success',
+      results: tourData.length,
       tourData
     });
   } catch (err) {
@@ -34,6 +35,7 @@ exports.getTour = async (req, res) => {
   console.log('Hajimemashite');
   try {
     const tour = await Tour.findById(req.params.id);
+    console.log(req.params.id);
     res.status(200).json({
       status: 'success',
       tour

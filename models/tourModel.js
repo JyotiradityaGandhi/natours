@@ -47,10 +47,11 @@ const tourSchema = new mongoose.Schema({
   images: [String],
   createdAt: {
     type: Date,
-    default: Date.now()
+    default: Date.now(),
+    select: false
   },
   startDates: [Date]
 });
 
-const Tour = mongoose.model('Tour', tourSchema);
+const Tour = mongoose.model('tour', tourSchema);
 module.exports = Tour;
