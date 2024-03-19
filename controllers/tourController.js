@@ -68,7 +68,8 @@ exports.updateTour = async (req, res) => {
   console.log('Itterashai');
   try {
     const updatedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-      new: true
+      new: true,
+      runValidators: true
     });
     res.status(200).json({
       status: 'success',
@@ -102,7 +103,7 @@ exports.getTourStats = async (req, res) => {
   try {
     const stats = await Tour.aggregate([
       {
-        $match: { ratingsAverage: { $gte: 4.8 } }
+        $match: { ratingsAverage: { $gte: 4.5 } }
       },
       {
         $group: {
@@ -120,11 +121,6 @@ exports.getTourStats = async (req, res) => {
           avgPrice: 1
         }
       }
-      // {
-      //   $match: {
-      //     _id: {$ne: 'EASY'},
-      //   }
-      // }
     ]);
     res.status(200).json({
       status: 'success',
